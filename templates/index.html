@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lexi</title>
+    <link rel="icon" href="static/icon.png">
+
+    <style>
+        /* === Modern Clean Black Theme === */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+        body {
+            background: url("static/b.jpg") center center / cover no-repeat fixed;
+            font-family: "Poppins", sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #111;
+        }
+
+        /* ---- Header (Bigger, Premium, Perfect Center) ---- */
+        header {
+            padding: 28px 10px;
+            animation: fadeDown 0.6s ease;
+            display: flex;
+            justify-content: center;
+        }
+
+        .header-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 72px;   /* ✅ slightly increased from 65px */
+            height: 72px;
+            object-fit: contain;
+        }
+
+        .title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .title h1 {
+            margin: 0;
+            font-size: 36px;   /* ✅ slightly bigger for balance */
+            font-weight: 700;
+            color: #111;
+            letter-spacing: 0.5px;
+        }
+
+        .title p {
+            margin: 4px 0 0;
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        @keyframes fadeDown {
+            from {opacity: 0; transform: translateY(-15px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+
+        /* ---- Main Container ---- */
+        .container {
+            width: 94%;
+            max-width: 1100px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+
+        /* ---- Form ---- */
+        form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input[type=text] {
+            flex: 1;
+            padding: 13px;
+            font-size: 16px;
+            border: 2px solid #000;
+            border-radius: 8px;
+            transition: 0.25s;
+        }
+
+        input[type=text]:focus {
+            outline: none;
+            border-color: #555;
+            box-shadow: 0 0 6px rgba(0,0,0,0.3);
+        }
+
+        input[type=submit] {
+            padding: 13px 30px;
+            font-size: 16px;
+            background: #000;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        input[type=submit]:hover {
+            background: #333;
+            transform: translateY(-2px);
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.25);
+        }
+
+        /* ---- Section Titles ---- */
+        h2 {
+            color: #000;
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            position: relative;
+            padding-bottom: 5px;
+        }
+
+        h2::after {
+            content: "";
+            width: 60px;
+            height: 3px;
+            background: #000;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            border-radius: 4px;
+        }
+
+        /* ---- Lists ---- */
+        ul, ol {
+            padding-left: 20px;
+            line-height: 1.6;
+            font-size: 15px;
+            color: #111;
+            font-weight: 500;
+        }
+
+        ul li, ol li {
+            margin-bottom: 6px;
+            word-wrap: break-word;
+        }
+
+        /* ---- URLs ---- */
+        a {
+            color: #000;
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 1px solid #00000030;
+            padding-bottom: 2px;
+            transition: 0.2s;
+            word-break: break-all;
+        }
+
+        a:hover {
+            color: #444;
+            border-bottom: 1px solid #444;
+        }
+
+        /* ---- Error Box ---- */
+        .error {
+            background: #ffe5e5;
+            padding: 12px;
+            border-left: 4px solid #c70000;
+            color: #000;
+            font-weight: 600;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        /* ✅ Responsive for Phones */
+        @media (max-width: 600px) {
+            .logo {
+                width: 58px;   /* ✅ increased mobile size */
+                height: 58px;
+            }
+
+            .title h1 {
+                font-size: 28px;
+            }
+
+            .title p {
+                font-size: 13px;
+            }
+
+            .container {
+                padding: 22px;
+            }
+
+            form {
+                flex-direction: column;
+            }
+
+            input[type=submit] {
+                width: 100%;
+                padding: 12px;
+            }
+        }
+        /* ---- Footer Bottom Right ---- */
+footer {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #222;
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0.7;
+    text-align: center;
+}
+
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-box">
+            <img src="static/icon.png" alt="Lexi Logo" class="logo">
+            <div class="title">
+                <h1>Lexi</h1>
+                <p>All the Web. One Answer. Meet Lexi</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <form action="/" method="POST">
+            <input type="text" name="topic" placeholder="Enter topic..." required>
+            <input type="submit" value="Search">
+        </form>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+        {% if urls_found %}
+            <h2>Top URLs</h2>
+            <ul>
+                {% for url in urls_found %}
+                    <li><a href="{{ url }}" target="_blank">{{ url }}</a></li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if summary %}
+            <h2>Summary</h2>
+            <ol>
+                {% for sentence in summary %}
+                    <li>{{ sentence }}</li>
+                {% endfor %}
+            </ol>
+        {% endif %}
+
+    </div>
+    <footer>
+         © 2025 Lexi — Server 1
+    </footer>
+</body>
+</html>
