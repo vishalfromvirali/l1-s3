@@ -1,7 +1,5 @@
-Flask
-requests
-beautifulsoup4
-google-search-results
-sumy
-nltk
-gunicorn
+Flask==2.3.6
+requests==2.32.4
+beautifulsoup4==4.12.2
+sumy==0.11.0
+serpapi==2.4.2
