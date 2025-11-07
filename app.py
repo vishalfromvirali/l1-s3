@@ -4,113 +4,135 @@ import time
 import requests
 from bs4 import BeautifulSoup
 from flask import Flask, render_template, request
-from serpapi import search     # ✅ Only working import in serpapi==0.1.5
-from sumy.nlp.tokenizers import Tokenizer
-from sumy.parsers.plaintext import PlaintextParser
-from sumy.summarizers.lsa import LsaSummarizer
-
-# Cache
-cache = {}
+from serpapi import GoogleSearch
 
 app = Flask(__name__)
 
+# Cache to reduce API usage
+cache = {
+    "who is create you": {
+        "summary": ["His name is Vishal."],
+        "error": None,
+        "urls_found": ["https://novix-chat-3.onrender.com"]
+    }
+}
 
+# ---------------------- CLEAN TEXT ----------------------
 def clean_text(text):
     text = re.sub(r'\[\d+\]', '', text)
     text = re.sub(r'\s+', ' ', text)
     return text.strip()
 
-
+# ---------------------- SCRAPE WEBSITE ----------------------
 def scrape_and_clean_text(url):
     try:
-        r = requests.get(url, headers={"User-Agent": "Mozilla"}, timeout=8)
-        r.raise_for_status()
-    except Exception:
+        response = requests.get(
+            url,
+            headers={"User-Agent": "Mozilla/5.0"},
+            timeout=8
+        )
+        response.raise_for_status()
+    except Exception as e:
+        print(f"⚠️ Error fetching {url}: {e}")
         return ""
 
-    soup = BeautifulSoup(r.text, "html.parser")
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    # Remove useless tags
     for tag in soup(["script", "style", "header", "footer", "nav", "iframe"]):
         tag.decompose()
 
-    main = soup.find("main") or soup.body
-    if not main:
+    main_content = soup.find("main") or soup.body
+    if not main_content:
         return ""
 
-    texts = [t.strip() for t in main.stripped_strings]
-    final = " ".join(texts)
-    final = clean_text(final)
+    text_elements = main_content.find_all(string=True)
+    visible_texts = [t.strip() for t in text_elements if t.strip()]
 
-    if len(final) < 150:
-        return ""
+    full_text = clean_text(" ".join(visible_texts))
 
-    return final
+    return full_text if len(full_text) > 150 else ""
 
-
+# ---------------------- SIMPLE SUMMARIZER (NO NLTK) ----------------------
 def summarize_text(full_text):
-    if len(full_text) < 150:
+    if not full_text:
         return []
 
-    parser = PlaintextParser.from_string(full_text, Tokenizer("english"))
-    summarizer = LsaSummarizer()
-    summary = summarizer(parser.document, 5)
-    return [str(sentence) for sentence in summary]
+    sentences = re.split(r'(?<=[.!?]) +', full_text)
+    sentences = [s.strip() for s in sentences if len(s.strip()) > 40]
 
+    return sentences[:5] if sentences else ["Not enough content to summarize."]
 
-@app.route("/", methods=["GET", "POST"])
+# ---------------------- ROUTES ----------------------
+@app.route('/', methods=['GET', 'POST'])
 def home():
-    if request.method == "POST":
-        topic = request.form.get("topic")
+    if request.method == 'POST':
+        topic = request.form.get('topic', '').strip()
 
         if not topic:
             return render_template("index.html", error="Please enter a topic.")
 
+        # Cache check
         if topic in cache:
             return render_template(
                 "index.html",
+                topic=topic,
                 summary=cache[topic]["summary"],
-                urls_found=cache[topic]["urls"],
-                error=None
+                urls_found=cache[topic]["urls_found"],
+                error=cache[topic]["error"]
             )
 
         api_key = os.environ.get("SERPAPI_API_KEY")
         if not api_key:
-            return render_template("index.html", error="SERPAPI_API_KEY not set")
+            return render_template("index.html", error="SERPAPI_API_KEY is missing!")
 
-        # ✅ FIX: Use serpapi.search() instead of GoogleSearch
-        result = search(
-            q=topic,
-            engine="google",
-            api_key=api_key,
-            num=5
-        )
+        params = {
+            "engine": "google",
+            "q": topic,
+            "api_key": api_key,
+            "num": "5"
+        }
 
-        urls = []
-        organic = result.get("organic_results", [])
+        try:
+            search = GoogleSearch(params)
+            results = search.get_dict()
+            organic = results.get("organic_results", [])
+            urls = [x["link"] for x in organic if "link" in x]
+        except Exception as e:
+            return render_template("index.html", error=f"API Error: {e}")
 
-        for item in organic:
-            if "link" in item:
-                urls.append(item["link"])
+        if not urls:
+            return render_template("index.html", error="No search results found.")
 
         all_text = ""
-        for u in urls:
-            text = scrape_and_clean_text(u)
-            if text:
-                all_text += text
+        found_urls = []
+
+        for url in urls:
+            page_text = scrape_and_clean_text(url)
+            if page_text:
+                all_text += page_text + "\n"
+                found_urls.append(url)
             time.sleep(1)
 
         summary = summarize_text(all_text)
 
-        cache[topic] = {"summary": summary, "urls": urls}
+        cache[topic] = {
+            "summary": summary,
+            "urls_found": found_urls,
+            "error": None
+        }
 
         return render_template(
             "index.html",
+            topic=topic,
             summary=summary,
-            urls_found=urls,
+            urls_found=found_urls,
             error=None
         )
 
     return render_template("index.html")
 
-
+# ---------------------- RUN SERVER ----------------------
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
