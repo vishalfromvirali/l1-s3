@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from flask import Flask, render_template, request
 from serpapi import GoogleSearch
 
+
 app = Flask(__name__)
 
 # Cache to reduce API usage
