@@ -13,7 +13,7 @@ app = Flask(__name__)
 # Cache to reduce API usage
 cache = {
     "who is create you": {
-        "summary": ["His name is Vishal."],
+        "summary": ["His name is Vishal and my name Lexi."],
         "error": None,
         "urls_found": ["https://novix-chat-3.onrender.com"]
     }
